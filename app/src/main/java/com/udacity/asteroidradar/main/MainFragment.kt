@@ -29,11 +29,11 @@ class MainFragment : Fragment() {
             viewModel.onAsteroidClicked(asteroidId)
         })
         binding.asteroidRecycler.adapter = adapter
-        var test_aster : Asteroid =  Asteroid(1, "AA", "12", 1.1,2.2,3.3,4.4,true )
-        var test_aster2 : Asteroid =  Asteroid(2, "BB", "13", 10.10,20.20,30.30,40.40,false )
-        var data_test : List<Asteroid> = listOf(test_aster, test_aster2)
-
-        adapter.submitList(data_test)
+//        var test_aster : Asteroid =  Asteroid(1, "AA", "12", 1.1,2.2,3.3,4.4,true )
+//        var test_aster2 : Asteroid =  Asteroid(2, "BB", "13", 10.10,20.20,30.30,40.40,false )
+//        var data_test : List<Asteroid> = listOf(test_aster, test_aster2)
+//
+//        adapter.submitList(data_test)
         setHasOptionsMenu(true)
 
         viewModel.navigateToDetailScreen.observe(viewLifecycleOwner, Observer{ asteroid ->
@@ -42,6 +42,10 @@ class MainFragment : Fragment() {
                 viewModel.onSetDetailNavigated()
 
             }
+        })
+
+        viewModel.asteroidFeed.observe(viewLifecycleOwner, Observer { asteroidList ->
+            adapter.submitList(asteroidList)
         })
 
         return binding.root
