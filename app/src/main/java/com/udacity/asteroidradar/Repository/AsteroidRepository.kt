@@ -14,6 +14,7 @@ import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import retrofit2.await
 
+enum class AsteroidFilter{WEEK, TODAY, FAVORITE}
 class AsteroidRepository(private val database: AsteroidDatabase) {
 
     //    This is the property that everyone can use to observe asteroids from the repo
@@ -24,9 +25,9 @@ class AsteroidRepository(private val database: AsteroidDatabase) {
     suspend fun refreshData(){
         withContext(Dispatchers.IO){
             try{
-            val responseList = Service.Network.retrofitService.getAsteroids()
-            val asteroidList = parseAsteroidsJsonResult(JSONObject(responseList))
-            database.asteroidDBDao.insertALl(*asteroidList.asDatabasesModel())
+                val responseList = Service.Network.retrofitService.getAsteroids()
+                val asteroidList = parseAsteroidsJsonResult(JSONObject(responseList))
+                database.asteroidDBDao.insertALl(*asteroidList.asDatabasesModel())
             }catch (e: Exception){
                 Log.i("Repo", "Can't access data")
             }
@@ -37,5 +38,17 @@ class AsteroidRepository(private val database: AsteroidDatabase) {
         withContext(Dispatchers.IO){
             database.asteroidDBDao.deletePrevAsteroids(Service.getDays.today)
         }
+    }
+
+    suspend fun getAsteroidFiltered(filter: AsteroidFilter) : List<Asteroid>{
+        var filteredResult: List<Asteroid> = listOf()
+        withContext(Dispatchers.IO){
+            filteredResult = when(filter){
+                AsteroidFilter.TODAY -> database.asteroidDBDao.getTodayData(Service.getDays.today).asDomainModel()
+                AsteroidFilter.WEEK -> asteroids.value!!
+                AsteroidFilter.FAVORITE -> database.asteroidDBDao.getTodayData(Service.getDays.today).asDomainModel()
+            }
+        }
+        return filteredResult
     }
 }

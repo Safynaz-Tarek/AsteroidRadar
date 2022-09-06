@@ -10,6 +10,7 @@ import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
 import com.udacity.asteroidradar.model.Asteroid
 import com.udacity.asteroidradar.R
+import com.udacity.asteroidradar.Repository.AsteroidFilter
 import com.udacity.asteroidradar.databinding.FragmentMainBinding
 
 class MainFragment : Fragment() {
@@ -28,6 +29,7 @@ class MainFragment : Fragment() {
         val adapter = MainAdapter(AsteroidListener { asteroidId ->
             viewModel.onAsteroidClicked(asteroidId)
         })
+
         binding.asteroidRecycler.adapter = adapter
 
         setHasOptionsMenu(true)
@@ -40,8 +42,18 @@ class MainFragment : Fragment() {
             }
         })
 
+        viewModel.isFilterApplied.observe(viewLifecycleOwner, Observer {
+            if(it == true){
+                adapter.submitList(viewModel.asteroidFilteredFeed)
+                viewModel.doneFiltering()
+                binding.asteroidRecycler.layoutManager?.scrollToPosition(0)
+            }
+        })
+
         viewModel.asteroidFeed.observe(viewLifecycleOwner, Observer { asteroidList ->
-            adapter.submitList(asteroidList)
+            if(viewModel.isFilterApplied.value == false){
+                adapter.submitList(asteroidList)
+            }
         })
 
         return binding.root
@@ -53,6 +65,14 @@ class MainFragment : Fragment() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        viewModel.getFilteredAsteroids(
+            when(item.itemId){
+                R.id.show_today_menu -> AsteroidFilter.TODAY
+                R.id.show_week_menu -> AsteroidFilter.WEEK
+                R.id.show_saved_menu -> AsteroidFilter.FAVORITE
+                else -> AsteroidFilter.WEEK
+            }
+        )
         return true
     }
 }

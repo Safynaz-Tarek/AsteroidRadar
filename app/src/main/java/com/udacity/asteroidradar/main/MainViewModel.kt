@@ -2,6 +2,7 @@ package com.udacity.asteroidradar.main
 
 import android.app.Application
 import androidx.lifecycle.*
+import com.udacity.asteroidradar.Repository.AsteroidFilter
 import com.udacity.asteroidradar.Repository.AsteroidRepository
 import com.udacity.asteroidradar.api.Service
 import com.udacity.asteroidradar.database.getDatabase
@@ -13,16 +14,37 @@ import retrofit2.Response
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
+
+//    This part is for the refresh / repo
+
+
     private val database = getDatabase(application)
     private val asteroidsRepo = AsteroidRepository(database)
+    var isFilterApplied = MutableLiveData<Boolean>()
 
     init {
         viewModelScope.launch {
             asteroidsRepo.refreshData()
+            isFilterApplied.value = false
+        }
+    }
+    
+//    This part is for applying filtering
+
+    lateinit var asteroidFilteredFeed :List<Asteroid>
+    val asteroidFeed = asteroidsRepo.asteroids
+
+    fun getFilteredAsteroids(filter: AsteroidFilter){
+        viewModelScope.launch {
+            asteroidFilteredFeed = asteroidsRepo.getAsteroidFiltered(filter)
+            isFilterApplied.value = true
+
         }
     }
 
-    val asteroidFeed = asteroidsRepo.asteroids
+    fun doneFiltering(){
+        isFilterApplied.value = false
+    }
 
 //    This part is to navigate to the detail screen
     private val _navigateToDetailScreen = MutableLiveData<Asteroid?>()
