@@ -60,6 +60,7 @@ class MainFragment : Fragment() {
             it?.let {
                 val url = it.url
                 Picasso.get().load(url).into(binding.activityMainImageOfTheDay)
+                binding.activityMainImageOfTheDay.contentDescription=  it.title
             }
         })
 
@@ -76,7 +77,6 @@ class MainFragment : Fragment() {
             when(item.itemId){
                 R.id.show_today_menu -> AsteroidFilter.TODAY
                 R.id.show_week_menu -> AsteroidFilter.WEEK
-                R.id.show_saved_menu -> AsteroidFilter.FAVORITE
                 else -> AsteroidFilter.WEEK
             }
         )

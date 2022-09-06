@@ -29,7 +29,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_help_circle"
-            app:statusIcon="@{asteroidData.potentiallyHazardous}"/>
+            app:statusIcon="@{asteroidData.potentiallyHazardous}"
+            app:statusDescription="@{asteroidData.potentiallyHazardous}"/>
 
         <TextView
             android:id="@+id/asteroid_name_textview"
