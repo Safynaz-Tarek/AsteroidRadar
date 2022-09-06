@@ -4,7 +4,8 @@ import android.os.Build
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.work.*
-import com.udacity.asteroidradar.work.RefreshAndDeleteDataWorkers
+import com.udacity.asteroidradar.work.DeleteDataWorkers
+import com.udacity.asteroidradar.work.RefreshDataWorkers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -20,9 +21,9 @@ class MainActivity : AppCompatActivity() {
         delayedInit()
     }
 
-    private fun delayedInit() = applicationScope.launch{stopRecurringWork()}
+    private fun delayedInit() = applicationScope.launch{setupRecurringWork()}
 
-    private fun stopRecurringWork() {
+    private fun setupRecurringWork() {
 
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.UNMETERED)
@@ -34,14 +35,24 @@ class MainActivity : AppCompatActivity() {
                 }
             }.build()
 
-        val repeatingRequest = PeriodicWorkRequestBuilder<RefreshAndDeleteDataWorkers>(1, TimeUnit.DAYS)
+        val repeatingRefreshRequest = PeriodicWorkRequestBuilder<RefreshDataWorkers>(1, TimeUnit.DAYS)
+            .setConstraints(constraints)
+            .build()
+
+        val repeatingDeleteRequest = PeriodicWorkRequestBuilder<DeleteDataWorkers>(1, TimeUnit.DAYS)
             .setConstraints(constraints)
             .build()
 
         WorkManager.getInstance().enqueueUniquePeriodicWork(
-            RefreshAndDeleteDataWorkers.WORK_NAME,
+            RefreshDataWorkers.WORK_NAME,
             ExistingPeriodicWorkPolicy.KEEP,
-            repeatingRequest
+            repeatingRefreshRequest
+        )
+
+        WorkManager.getInstance().enqueueUniquePeriodicWork(
+            DeleteDataWorkers.WORK_NAME,
+            ExistingPeriodicWorkPolicy.KEEP,
+            repeatingDeleteRequest
         )
     }
 
