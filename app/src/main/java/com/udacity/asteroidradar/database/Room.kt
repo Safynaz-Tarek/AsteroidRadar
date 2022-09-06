@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.udacity.asteroidradar.model.Asteroid
+import com.udacity.asteroidradar.model.PictureOfDay
 
 @Dao
 interface AsteroidDatabaseDao {
@@ -20,10 +21,16 @@ interface AsteroidDatabaseDao {
     @Query("SELECT * from databaseasteroids WHERE closeApproachDate == :day ORDER BY closeApproachDate Desc")
     fun getTodayData(day: String): List<DatabaseAsteroids>
 
+    @Query("SELECT * FROM picture_of_day_table")
+    fun getPictureOfTheDayLiveData(): LiveData<PictureOfDay>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertPicture(picture: PictureOfDay)
 
 }
 
-@Database(entities = [DatabaseAsteroids::class], version = 1, exportSchema = false)
+
+@Database(entities = [DatabaseAsteroids::class, PictureOfDay::class], version = 1, exportSchema = false)
 abstract class AsteroidDatabase: RoomDatabase() {
     abstract val asteroidDBDao: AsteroidDatabaseDao
 }

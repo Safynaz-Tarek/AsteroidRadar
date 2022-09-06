@@ -2,13 +2,11 @@ package com.udacity.asteroidradar.main
 
 import android.os.Bundle
 import android.view.*
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
-import androidx.navigation.fragment.findNavController
-import com.udacity.asteroidradar.model.Asteroid
+import com.squareup.picasso.Picasso
 import com.udacity.asteroidradar.R
 import com.udacity.asteroidradar.Repository.AsteroidFilter
 import com.udacity.asteroidradar.databinding.FragmentMainBinding
@@ -46,13 +44,22 @@ class MainFragment : Fragment() {
             if(it == true){
                 adapter.submitList(viewModel.asteroidFilteredFeed)
                 viewModel.doneFiltering()
-                binding.asteroidRecycler.layoutManager?.scrollToPosition(0)
+//                binding.asteroidRecycler.layoutManager?.scrollToPosition(0)
             }
         })
 
         viewModel.asteroidFeed.observe(viewLifecycleOwner, Observer { asteroidList ->
             if(viewModel.isFilterApplied.value == false){
                 adapter.submitList(asteroidList)
+                binding.asteroidRecycler.layoutManager?.scrollToPosition(binding.asteroidRecycler.top);
+
+            }
+        })
+
+        viewModel.pictureOfDay.observe(viewLifecycleOwner, Observer {
+            it?.let {
+                val url = it.url
+                Picasso.get().load(url).into(binding.activityMainImageOfTheDay)
             }
         })
 

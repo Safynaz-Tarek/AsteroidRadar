@@ -4,19 +4,15 @@ import android.app.Application
 import androidx.lifecycle.*
 import com.udacity.asteroidradar.Repository.AsteroidFilter
 import com.udacity.asteroidradar.Repository.AsteroidRepository
-import com.udacity.asteroidradar.api.Service
 import com.udacity.asteroidradar.database.getDatabase
 import com.udacity.asteroidradar.model.Asteroid
+import com.udacity.asteroidradar.model.PictureOfDay
 import kotlinx.coroutines.launch
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
-
 //    This part is for the refresh / repo
-
 
     private val database = getDatabase(application)
     private val asteroidsRepo = AsteroidRepository(database)
@@ -24,16 +20,19 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     init {
         viewModelScope.launch {
-            asteroidsRepo.refreshData()
             isFilterApplied.value = false
+            asteroidsRepo.refreshData()
+            asteroidsRepo.getPictureOfDay()
+
         }
     }
-    
-//    This part is for applying filtering
+
 
     lateinit var asteroidFilteredFeed :List<Asteroid>
     val asteroidFeed = asteroidsRepo.asteroids
+    val pictureOfDay= asteroidsRepo.pictureOfDay
 
+    //    This part is for applying filtering
     fun getFilteredAsteroids(filter: AsteroidFilter){
         viewModelScope.launch {
             asteroidFilteredFeed = asteroidsRepo.getAsteroidFiltered(filter)
