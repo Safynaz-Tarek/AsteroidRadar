@@ -23,6 +23,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     val asteroidFeed = asteroidsRepo.asteroids
+
 //    This part is to navigate to the detail screen
     private val _navigateToDetailScreen = MutableLiveData<Asteroid?>()
     val navigateToDetailScreen

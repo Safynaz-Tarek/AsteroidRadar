@@ -1,5 +1,6 @@
 package com.udacity.asteroidradar.Repository
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
 import com.udacity.asteroidradar.api.Service
@@ -22,9 +23,19 @@ class AsteroidRepository(private val database: AsteroidDatabase) {
 
     suspend fun refreshData(){
         withContext(Dispatchers.IO){
+            try{
             val responseList = Service.Network.retrofitService.getAsteroids()
             val asteroidList = parseAsteroidsJsonResult(JSONObject(responseList))
             database.asteroidDBDao.insertALl(*asteroidList.asDatabasesModel())
+            }catch (e: Exception){
+                Log.i("Repo", "Can't access data")
+            }
+        }
+    }
+
+    suspend fun deleteData(){
+        withContext(Dispatchers.IO){
+            database.asteroidDBDao.deletePrevAsteroids(Service.getDays.today)
         }
     }
 }
